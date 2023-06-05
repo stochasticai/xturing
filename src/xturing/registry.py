@@ -2,6 +2,8 @@ from typing import Any, Dict
 
 
 class BaseParent:
+    registry: Dict[str, Any] = {}
+
     @classmethod
     def add_to_registry(cls, name: str, obj: Any):
         assert (
