@@ -1,6 +1,5 @@
 import math
 import os
-from pathlib import Path
 from shutil import copyfile
 from typing import Any, Dict, List, Optional, Tuple, Union
 
@@ -17,8 +16,6 @@ from transformers.modeling_outputs import (
 )
 from transformers.modeling_utils import PreTrainedModel
 from transformers.tokenization_utils import PreTrainedTokenizer
-
-from xturing.engines.causal import CausalEngine, CausalLoraEngine
 
 # Tokenizer taken from transformers library: https://github.com/huggingface/transformers
 """Tokenization classes for LLaMA."""

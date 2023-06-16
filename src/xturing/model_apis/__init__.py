@@ -1,11 +1,11 @@
-from .ai21 import AI21TextGenerationAPI
-from .ai21 import J2Grande as AI21J2Grande
-from .base import BaseApi, TextGenerationAPI
-from .cohere import CohereTextGenerationAPI
-from .cohere import Medium as CohereMedium
-from .openai import ChatGPT as OpenAIChatGPT
-from .openai import Davinci as OpenAIDavinci
-from .openai import OpenAITextGenerationAPI
+from xturing.model_apis.ai21 import AI21TextGenerationAPI
+from xturing.model_apis.ai21 import J2Grande as AI21J2Grande
+from xturing.model_apis.base import BaseApi, TextGenerationAPI
+from xturing.model_apis.cohere import CohereTextGenerationAPI
+from xturing.model_apis.cohere import Medium as CohereMedium
+from xturing.model_apis.openai import ChatGPT as OpenAIChatGPT
+from xturing.model_apis.openai import Davinci as OpenAIDavinci
+from xturing.model_apis.openai import OpenAITextGenerationAPI
 
 BaseApi.add_to_registry(OpenAITextGenerationAPI.config_name, OpenAITextGenerationAPI)
 BaseApi.add_to_registry(CohereTextGenerationAPI.config_name, CohereTextGenerationAPI)

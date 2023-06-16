@@ -1,2 +1,2 @@
-from .base import BaseTrainer
-from .lightning_trainer import LightningTrainer
+from xturing.trainers.base import BaseTrainer
+from xturing.trainers.lightning_trainer import LightningTrainer

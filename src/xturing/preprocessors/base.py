@@ -1,4 +1,3 @@
-from xturing.models.stable_diffusion import StableDiffusion
 from xturing.preprocessors.instruction_collator import InstructionDataCollator
 from xturing.preprocessors.text_collator import TextDataCollator
 from xturing.registry import BaseParent

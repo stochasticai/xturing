@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from typing import Iterable, List, Optional, Type, Union
+from typing import Iterable, List, Optional, Union
 
 import torch
 from pytorch_lightning.loggers import Logger
@@ -13,7 +13,6 @@ from xturing.config.read_config import load_config
 from xturing.datasets.instruction_dataset import InstructionDataset
 from xturing.datasets.text_dataset import TextDataset
 from xturing.engines.base import BaseEngine
-from xturing.engines.causal import CausalLoraEngine
 from xturing.models import BaseModel
 from xturing.preprocessors.base import BasePreprocessor
 from xturing.trainers.base import BaseTrainer

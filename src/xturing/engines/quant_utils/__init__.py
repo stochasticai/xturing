@@ -1,1 +1,1 @@
-from .quant import make_quant, autotune_warmup, QuantLinear
+from xturing.engines.quant_utils.quant import QuantLinear, autotune_warmup, make_quant

@@ -2,19 +2,9 @@
 """Functionality for splitting text."""
 from __future__ import annotations
 
-import copy
 import logging
 from abc import ABC, abstractmethod
-from typing import (
-    AbstractSet,
-    Any,
-    Callable,
-    Collection,
-    Iterable,
-    List,
-    Optional,
-    Union,
-)
+from typing import Any, Callable, Iterable, List, Optional
 
 logger = logging.getLogger()
 
@@ -117,8 +107,8 @@ class TextSplitter(ABC):
     def from_tiktoken_encoder(
         cls,
         encoding_name: str = "gpt2",
-        allowed_special = set(),
-        disallowed_special = set(),
+        allowed_special=set(),
+        disallowed_special=set(),
         **kwargs: Any,
     ) -> TextSplitter:
         """Text splitter that uses tiktoken encoder to count length."""

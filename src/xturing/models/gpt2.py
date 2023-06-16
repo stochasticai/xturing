@@ -6,8 +6,12 @@ from xturing.engines.gpt2_engine import (
     GPT2LoraEngine,
     GPT2LoraInt8Engine,
 )
-
-from .causal import CausalInt8Model, CausalLoraInt8Model, CausalLoraModel, CausalModel
+from xturing.models.causal import (
+    CausalInt8Model,
+    CausalLoraInt8Model,
+    CausalLoraModel,
+    CausalModel,
+)
 
 
 class GPT2(CausalModel):

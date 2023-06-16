@@ -1,16 +1,13 @@
 import datetime
-import os
-import tempfile
-import uuid
 from pathlib import Path
-from typing import Iterable, Optional, Union, Type
+from typing import Iterable, Optional, Union
 
 import pytorch_lightning as pl
 import torch
 from deepspeed.ops.adam import DeepSpeedCPUAdam
 from pytorch_lightning import callbacks
-from pytorch_lightning.trainer.trainer import Trainer
 from pytorch_lightning.loggers import Logger
+from pytorch_lightning.trainer.trainer import Trainer
 
 from xturing.config import DEFAULT_DEVICE, IS_INTERACTIVE
 from xturing.datasets.base import BaseDataset

@@ -1,2 +1,4 @@
 pre-commit
 pytest
+autoflake
+absoulify-imports
