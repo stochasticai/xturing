@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from typing import Iterable, List, Optional, Type, Union
+from typing import Iterable, List, Optional, Tuple, Type, Union
 
 import torch
 from pytorch_lightning.loggers import Logger
@@ -19,7 +19,16 @@ from xturing.preprocessors.base import BasePreprocessor
 from xturing.trainers.base import BaseTrainer
 from xturing.trainers.lightning_trainer import LightningTrainer
 from xturing.utils.logging import configure_logger
-from xturing.utils.utils import _filter_args
+from xturing.utils.metrics import get_accuracy
+from xturing.utils.prompt import (
+    OpenAIChatMessage,
+    OpenAICreateChatPrompt,
+    OpenAICreatePrompt,
+    Prompt,
+    chat_prompt_to_text,
+    is_chat_prompt,
+)
+from xturing.utils.utils import _filter_args, _index_samples
 
 logger = configure_logger(__name__)
 
@@ -112,9 +121,6 @@ class CausalModel(BaseModel):
         trainer = self._make_trainer(dataset, logger)
         trainer.fit()
 
-    def evaluate(self, dataset: Union[TextDataset, InstructionDataset]):
-        pass
-
     def _generate_from_iterable(
         self, data_iterator: Iterable, do_tokenization=False, show_tqdm_bar=True
     ):
@@ -206,6 +212,83 @@ class CausalModel(BaseModel):
         self.engine.save(path)
         self._save_config(path=path)
 
+    def completion_query(
+        self, prompt: Union[OpenAICreatePrompt, OpenAICreateChatPrompt, Prompt]
+    ):
+        # actual_prompt = chat_prompt_to_text(prompt)
+        actual_prompt = prompt
+        logger.info(prompt)
+        text_out = self.generate(texts=[actual_prompt])
+
+        # parse results
+        # result = {
+        #     "text": text_out,
+        #     "tokens": None,
+        #     "logprobs": None,
+        # }
+
+        return text_out, actual_prompt
+
+    def check_sampled_text(
+        self,
+        prompt: Union[OpenAICreatePrompt, OpenAICreateChatPrompt, Prompt],
+        expected: Union[str, List[str], Tuple[str]],
+        *,
+        options: Optional[List[str]] = None,
+    ) -> Optional[str]:
+        if isinstance(expected, tuple):
+            expected = list(expected)
+        elif not isinstance(expected, list):
+            expected = [expected]
+        if options is None:
+            options = expected
+
+        output, actual_prompt = self.completion_query(prompt=prompt)
+
+        choice = output[0]
+
+        picked = sampled = choice.strip()
+
+        result = {
+            "prompt": actual_prompt,
+            "sampled": sampled,
+            "options": options,
+            "picked": picked,
+        }
+        result["expected"] = expected
+        result["match"] = picked in expected
+        return result
+
+    def eval_sample(self, sample, *args):
+        prompt = f"{sample.get('instruction', '')} {sample.get('text', ' ')}".strip()
+        return self.check_sampled_text(prompt, expected=sample["target"])
+
+    def eval_all_samples(
+        self,
+        samples,
+        show_progress=True,
+    ):
+        """
+        Evaluate all provided samples in parallel.
+        """
+        work_items = _index_samples(samples, logger)
+        show_progress = show_progress
+
+        def eval_sample(args):
+            sample, idx = args
+            return idx, self.eval_sample(sample)
+
+        logger.info(f"Running in sequential mode!")
+        iter = map(eval_sample, work_items)
+        idx_and_result = list(
+            tqdm(iter, total=len(work_items), disable=not show_progress)
+        )
+        return [r for _, r in sorted(idx_and_result)]
+
+    def evaluate(self, dataset: Union[TextDataset, InstructionDataset]):
+        outputs = self.eval_all_samples(dataset)
+        return get_accuracy(outputs)
+
 
 class CausalInt8Model(CausalModel):
     def __init__(
@@ -275,7 +358,7 @@ class CausalLoraInt8Model(CausalLoraModel):
             target_modules=target_modules,
             **kwargs,
         )
-        
+
 
 class CausalLoraKbitModel(CausalLoraModel):
     def __init__(self, engine: str, weights_path: Optional[str] = None):

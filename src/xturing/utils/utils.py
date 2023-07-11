@@ -1,13 +1,18 @@
 import contextlib
 import io
+import logging
 import os
 import random
 import string
 import sys
 import tempfile
 from pathlib import Path
+from typing import Any, List
 
 import yaml
+
+SHUFFLE_SEED = 123
+_MAX_SAMPLES = None
 
 
 def read_yamls(config_path):
@@ -134,3 +139,14 @@ def _filter_args(arguments: dict):
     for key in to_delete:
         del arguments[key]
     return arguments
+
+
+def _index_samples(samples: List[Any], logger: logging.Logger):
+    """Shuffle `samples` and pair each sample with its index."""
+    indices = list(range(len(samples)))
+    random.Random(SHUFFLE_SEED).shuffle(indices)
+    if _MAX_SAMPLES is not None:
+        indices = indices[:_MAX_SAMPLES]
+    logger.info(f"Evaluating {len(indices)} samples")
+    work_items = [(samples[i], i) for i in indices]
+    return work_items
